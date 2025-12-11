@@ -34,8 +34,8 @@ La configuración de pines ha sido extraída de la documentación original y ada
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone [https://github.com/tu-usuario/tu-repo.git](https://github.com/tu-usuario/tu-repo.git)
-    cd tu-repo
+    git clone https://github.com/microdevg/Proyecto-para-pantalla-JC3248W535EN-con-ESP-IDF.git
+    cd "Nombre de la carpeta"
     ```
 
 2.  **Configurar el proyecto:**
@@ -68,6 +68,7 @@ Se ha portado la lógica de inicialización y configuración de hardware para cu
 ## 📸 Galería
 
 **Pantalla funcionando con ESP-IDF:**
+
 <p align="center">
   <img src="docs/imagen_real.jpg" alt="Pantalla funcionando" width="640" height="auto">
 </p>
