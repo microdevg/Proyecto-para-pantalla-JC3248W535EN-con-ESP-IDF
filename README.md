@@ -72,3 +72,11 @@ Se ha portado la lógica de inicialización y configuración de hardware para cu
 <p align="center">
   <img src="docs/imagen_real.jpg" alt="Pantalla funcionando" width="640" height="auto">
 </p>
+
+
+**Ejemplo usando EEZ Studio para crear una interfaz basica**
+
+
+<p align="center">
+  <img src="docs/ejemplo.jpg" alt="Pantalla funcionando" width="640" height="auto">
+</p>
