@@ -11,6 +11,10 @@
 #include "esp_bsp.h"
 #include "lv_port.h"
 
+#include "ui/ui.h"
+
+
+
 static const char *TAG = "DEMO_LVGL";
 
 #define logSection(section) \
@@ -81,8 +85,11 @@ void app_main(void)
 
     bsp_display_lock(0);
 
-    lv_obj_t *scr = lv_scr_act();   // <-- ORIGEN DE LVGL CREADO
-    draw_argentina_flag(scr);       // <-- LLAMADA A TU FUNCIÓN
+    //lv_obj_t *scr = lv_scr_act();   // <-- ORIGEN DE LVGL CREADO
+    //draw_argentina_flag(scr);       // <-- LLAMADA A TU FUNCIÓN
+
+    ui_init();
+
 
     bsp_display_unlock();
 
