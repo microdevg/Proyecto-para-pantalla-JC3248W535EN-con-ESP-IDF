@@ -19,6 +19,7 @@ typedef struct _objects_t {
     lv_obj_t *main;
     lv_obj_t *principal;
     lv_obj_t *panel_interno;
+    lv_obj_t *ifts14;
     lv_obj_t *fan;
     lv_obj_t *panel_medicion;
     lv_obj_t *temperatura;

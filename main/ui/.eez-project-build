@@ -6,6 +6,7 @@
     "images.h",
     "images/ui_image_heatting.c",
     "images/ui_image_icon.c",
+    "images/ui_image_ifts14.c",
     "images/ui_image_mini_fan.c",
     "screens.c",
     "screens.h",

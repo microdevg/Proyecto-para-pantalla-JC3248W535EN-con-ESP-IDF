@@ -53,8 +53,17 @@ void create_screen_main() {
                     {
                         lv_obj_t *parent_obj = obj;
                         {
+                            // ifts14
                             lv_obj_t *obj = lv_img_create(parent_obj);
-                            lv_obj_set_pos(obj, -136, -128);
+                            objects.ifts14 = obj;
+                            lv_obj_set_pos(obj, 344, -35);
+                            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                            lv_img_set_src(obj, &img_ifts14);
+                            lv_img_set_zoom(obj, 150);
+                        }
+                        {
+                            lv_obj_t *obj = lv_img_create(parent_obj);
+                            lv_obj_set_pos(obj, -75, -128);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_img_set_src(obj, &img_icon);
                             lv_img_set_zoom(obj, 50);
@@ -63,7 +72,7 @@ void create_screen_main() {
                             // fan
                             lv_obj_t *obj = lv_img_create(parent_obj);
                             objects.fan = obj;
-                            lv_obj_set_pos(obj, 281, 7);
+                            lv_obj_set_pos(obj, 315, 9);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_img_set_src(obj, &img_mini_fan);
                             lv_img_set_zoom(obj, 100);
@@ -71,7 +80,7 @@ void create_screen_main() {
                         {
                             lv_obj_t *obj = lv_img_create(parent_obj);
                             objects.obj1 = obj;
-                            lv_obj_set_pos(obj, 337, 38);
+                            lv_obj_set_pos(obj, 370, 39);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_img_set_src(obj, &img_heatting);
                             lv_img_set_zoom(obj, 140);
@@ -80,7 +89,7 @@ void create_screen_main() {
                             // panel_medicion
                             lv_obj_t *obj = lv_obj_create(parent_obj);
                             objects.panel_medicion = obj;
-                            lv_obj_set_pos(obj, 141, 57);
+                            lv_obj_set_pos(obj, 168, 55);
                             lv_obj_set_size(obj, 162, 91);
                             lv_obj_set_style_border_width(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_obj_set_style_border_color(obj, lv_color_hex(0xe0e0e0), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -102,7 +111,7 @@ void create_screen_main() {
                             // SET
                             lv_obj_t *obj = lv_btn_create(parent_obj);
                             objects.set = obj;
-                            lv_obj_set_pos(obj, 141, 183);
+                            lv_obj_set_pos(obj, 168, 183);
                             lv_obj_set_size(obj, 162, 57);
                             lv_obj_add_event_cb(obj, action_set_ready, LV_EVENT_CLICKED, (void *)0);
                             lv_obj_set_style_bg_color(obj, lv_color_hex(0x303438), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -121,7 +130,7 @@ void create_screen_main() {
                         {
                             lv_obj_t *obj = lv_label_create(parent_obj);
                             objects.obj2 = obj;
-                            lv_obj_set_pos(obj, 43, 74);
+                            lv_obj_set_pos(obj, 55, 75);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_obj_set_style_text_font(obj, &lv_font_montserrat_48, LV_PART_MAIN | LV_STATE_DEFAULT);
                             lv_label_set_text(obj, "");
@@ -130,7 +139,7 @@ void create_screen_main() {
                             // refencia_slider
                             lv_obj_t *obj = lv_arc_create(parent_obj);
                             objects.refencia_slider = obj;
-                            lv_obj_set_pos(obj, 6, 148);
+                            lv_obj_set_pos(obj, 18, 152);
                             lv_obj_set_size(obj, 110, 92);
                             lv_arc_set_value(obj, 25);
                             lv_obj_add_event_cb(obj, action_update_data, LV_EVENT_PRESSING, (void *)0);
@@ -138,7 +147,7 @@ void create_screen_main() {
                         {
                             lv_obj_t *obj = lv_label_create(parent_obj);
                             objects.obj0 = obj;
-                            lv_obj_set_pos(obj, 135, 7);
+                            lv_obj_set_pos(obj, 135, -3);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_label_set_recolor(obj, true);
                             add_style_main_title(obj);

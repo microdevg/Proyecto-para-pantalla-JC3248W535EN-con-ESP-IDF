@@ -7,6 +7,6 @@ FILE(GLOB_RECURSE imgs ${CMAKE_SOURCE_DIR}/main/ui/images/*.c)
 
 
 
-idf_component_register(SRCS ${app_sources} ${ui}  ${images}
+idf_component_register(SRCS ${app_sources} ${ui}  ${imgs}
                         INCLUDE_DIRS ".")
 
