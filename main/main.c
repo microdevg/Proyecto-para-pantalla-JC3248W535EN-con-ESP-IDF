@@ -11,6 +11,120 @@
 #include "esp_bsp.h"
 #include "lv_port.h"
 
+
+#include "ui/ui.h"
+#include "ui/vars.h"
+#include "ui/actions.h"
+#include "ui/screens.h"
+#include <string.h>
+
+
+void crear_pantalla_contador(void) ;
+
+bool fan=true;
+
+bool get_var_fan() {
+    return fan;
+}
+
+void set_var_fan(bool value) {
+    fan = value;
+}
+
+
+bool heatting = true;
+
+bool get_var_heatting() {
+    return heatting;
+}
+
+void set_var_heatting(bool value) {
+    heatting = value;
+}
+
+
+int32_t medicion = 0, referencia = 0;
+ int32_t get_var_medicion(){
+    return medicion;
+}
+ void set_var_medicion(int32_t value){
+    medicion = value;
+}
+ int32_t get_var_referencia(){
+    return referencia;
+}
+ void set_var_referencia(int32_t value){
+    referencia = value;
+}
+
+
+
+QueueHandle_t xQueueRef = NULL;
+
+
+void vTaskMedicion(void * pvParameters);
+
+char string_medicion[100] = { "---" };
+char string_referencia[100] = { "---" };
+
+
+const char *get_var_string_medicion() {
+    return string_medicion;
+}
+
+void set_var_string_medicion(const char *value) {
+    strncpy(string_medicion, value, sizeof(string_medicion) / sizeof(char));
+    string_medicion[sizeof(string_medicion) / sizeof(char) - 1] = 0;
+}
+
+
+
+const char *get_var_string_referencia() {
+    return string_referencia;
+}
+
+void set_var_string_referencia(const char *value) {
+    strncpy(string_referencia, value, sizeof(string_referencia) / sizeof(char));
+    string_referencia[sizeof(string_referencia) / sizeof(char) - 1] = 0;
+}
+
+
+ void action_update_data(lv_event_t * e){
+    int32_t value = lv_arc_get_value( objects.refencia_slider);
+    set_var_referencia(value);
+    char buffer[10]={0};
+    printf("El valor de arc es:%ld\n",value);
+    sprintf(buffer,"%ld",value);
+    set_var_string_referencia(buffer);
+    ui_tick();
+
+}
+
+
+
+
+ void action_set_ready(lv_event_t * e){
+
+  
+// 1. Sacamos el valor del arco
+    int32_t ref = lv_arc_get_value(objects.refencia_slider);
+    printf("action:%ld -> Enviando a la cola...\n", ref);
+
+    if (xQueueRef != NULL) {
+        // 2. Enviamos el valor a la cola sin bloquear (timeout = 0)
+        // Si la cola está llena, xQueueOverwrite o liberar espacio dependerá de tu lógica, 
+        // aquí usamos xQueueSend.
+        if (xQueueSend(xQueueRef, &ref, 0) != pdPASS) {
+            printf("Cola llena. Ignorando nuevo valor.\n");
+        }
+    }
+
+ 
+    
+
+    
+}
+
 static const char *TAG = "DEMO_LVGL";
 
 #define logSection(section) \
@@ -53,15 +167,36 @@ void app_main(void)
     bsp_display_lock(0);
 
     lv_obj_t *scr = lv_scr_act();   // <-- ORIGEN DE LVGL CREADO
-    draw_argentina_flag(scr);       // <-- LLAMADA A TU FUNCIÓN
-
+ //   draw_argentina_flag(scr);       // <-- LLAMADA A TU FUNCIÓN
+   ui_init();
     bsp_display_unlock();
 
     logSection("LVGL porting example end");
+    int32_t value = lv_arc_get_value( objects.refencia_slider);
 
-    /* Bucle idle */
+    set_var_referencia(value);
+    char buff[20]={0};
+
+    sprintf(buff,"%ld",value);
+    set_var_string_referencia(buff);
+   
+
+
+// Creamos una cola para guardar 1 elemento de tipo int32_t
+    xQueueRef = xQueueCreate(1, sizeof(int32_t));
+    
+    if (xQueueRef != NULL) {
+        // Creamos la tarea que procesará el bucle en segundo plano
+        xTaskCreate(vTaskMedicion, "TaskMedicion", 4000, NULL, 1, NULL);
+    } else {
+        printf("Error al crear la cola\n");
+    }
+
+    crear_pantalla_contador();
+
     while (1) {
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(500));
+        lv_timer_handler();
     }
 }
 
@@ -149,4 +284,118 @@ void info_logs(){
 
     /* Inicialización del display */
     logSection("Initialize panel device");
+}
+
+
+void vTaskMedicion(void * pvParameters)
+{
+    int32_t target_ref = 0;
+    char buffer[20];
+
+    for(;;) 
+    {
+        // La tarea se bloquea aquí hasta que action_set_ready mande un dato
+        if (xQueueReceive(xQueueRef, &target_ref, portMAX_DELAY) == pdPASS) 
+        {
+            printf("Tarea iniciada. Destino: %ld\n", target_ref);
+
+            for (int32_t value = get_var_medicion(); value != target_ref; ) 
+            {
+                if(value < target_ref) {
+                    set_var_heatting(false);
+                    set_var_fan(true);
+
+                    value++;
+                }
+                else{
+                    set_var_fan(false);
+                    set_var_heatting(true);
+                    value --;
+                }
+               
+                set_var_medicion(value);
+                
+                snprintf(buffer, sizeof(buffer), "%ld ", value);
+                set_var_string_medicion(buffer);
+                
+                
+                 ui_tick(); // Si esto maneja lógica interna tuya, déjalo. 
+
+                vTaskDelay(pdMS_TO_TICKS(200)); 
+            }
+            set_var_heatting(true);
+            set_var_fan(true);
+            ui_tick(); // Si esto maneja lógica interna tuya, déjalo. 
+
+            printf("Bucle de medición finalizado.\n");
+        }
+    }
+}
+
+
+
+// --- VARIABLES Y CALLBACKS (Por fuera de la función de la UI) ---
+
+static int32_t contador = 0;
+static lv_obj_t * lbl_contador;
+
+// Acción para el botón de incrementar (+1)
+static void btn_incrementar_cb(lv_event_t * e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_CLICKED) {
+        contador++;
+        lv_label_set_text_fmt(lbl_contador, "%ld", contador);
+    }
+}
+
+// Acción para el botón de decrementar (-1)
+static void btn_decrementar_cb(lv_event_t * e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_CLICKED) {
+        contador--;
+        lv_label_set_text_fmt(lbl_contador, "%ld", contador);
+    }
+}
+
+
+// --- FUNCIÓN PRINCIPAL DE LA INTERFAZ ---
+
+void crear_pantalla_contador(void) {
+    // Obtener la pantalla activa actual
+    lv_obj_t * pantalla = lv_scr_act();
+
+    // 1. ETIQUETA DEL CONTADOR (Número grande en el centro)
+    lbl_contador = lv_label_create(pantalla);
+    lv_label_set_text(lbl_contador, "0");
+    
+    // Usamos una fuente grande nativa de LVGL para que resalte
+    lv_obj_set_style_text_font(lbl_contador, &lv_font_montserrat_32, 0); 
+    // Alineado al centro, pero subido 40 píxeles en el eje Y
+    lv_obj_align(lbl_contador, LV_ALIGN_CENTER, 0, -40);
+
+
+    // 2. BOTÓN DE DECREMENTAR (-1)
+    lv_obj_t * btn_menos = lv_btn_create(pantalla);
+    lv_obj_set_size(btn_menos, 90, 50); // Tamaño ideal para pantallas de 480x320
+    // Desplazado 80px a la izquierda y 40px hacia abajo del centro
+    lv_obj_align(btn_menos, LV_ALIGN_CENTER, -80, 40); 
+    lv_obj_add_event_cb(btn_menos, btn_decrementar_cb, LV_EVENT_CLICKED, NULL);
+
+    // Texto del botón -1
+    lv_obj_t * lbl_menos = lv_label_create(btn_menos);
+    lv_label_set_text(lbl_menos, "-1");
+    lv_obj_center(lbl_menos);
+
+
+    // 3. BOTÓN DE INCREMENTAR (+1)
+    lv_obj_t * btn_mas = lv_btn_create(pantalla);
+    lv_obj_set_size(btn_mas, 90, 50);
+    // Desplazado 80px a la derecha y 40px hacia abajo del centro
+    lv_obj_align(btn_mas, LV_ALIGN_CENTER, 80, 40); 
+    lv_obj_add_event_cb(btn_mas, btn_incrementar_cb, LV_EVENT_CLICKED, NULL);
+
+    // Texto del botón +1
+    lv_obj_t * lbl_mas = lv_label_create(btn_mas);
+    lv_label_set_text(lbl_mas, "+1");
+    lv_obj_center(lbl_mas);
 }

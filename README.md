@@ -67,8 +67,17 @@ Se ha portado la lógica de inicialización y configuración de hardware para cu
 
 ## 📸 Galería
 
+Para que este ejemplo compile debe copiar el contenido del archivo "configuracion_basica" en un archivo nuevo llamado sdkconfig.
+El archivo sdkconfig se borra y reescribe cuando usamos la funcion fullclean.
+
+
 **Pantalla funcionando con ESP-IDF:**
 
 <p align="center">
   <img src="docs/imagen_real.jpg" alt="Pantalla funcionando" width="640" height="auto">
 </p>
+
+
+### Novedades
+
+Se agrego el archivo partitions.csv para definir un sistema de particiones que permita aplicaciones mas grandes.
